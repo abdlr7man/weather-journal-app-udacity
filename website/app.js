@@ -21,9 +21,43 @@ const weatherDataFetcher = async () => {
       updateDivContent("date", newDate);
       updateDivContent("temp", Math.round(serializedResponse.main.temp));
       updateDivContent("content", userFeelingInput.value);
+    })
+    .then((dataToCache) => {
+      return postDataToServer(dataToCache);
     });
 };
 
+const getServerData = async () => {
+  try {
+    const response = await fetch("/data");
+    const data = await response.json();
+
+    const divData = document.getElementById("server-data");
+    divData.innerHTML = JSON.stringify(data.date);
+  }  catch (error) {
+    alert(error);
+  }
+}
+
+
+const postDataToServer = async (dataToSend) => {
+  try {
+    const req = await fetch("/data", {
+      method: "POST",
+
+      body: JSON.stringify({cache: dataToSend}),
+      credentials: 'same-origin',
+      headers: {
+            'Content-Type': 'application/json',
+        },
+
+    });
+
+    const responseData = await req.json();
+  } catch (error) {
+    alert(error);
+  }
+}
 /* Handlers */
 const generateBtnClickHandler = () => {
   if (zipCodeInput.value.length > 0) {
